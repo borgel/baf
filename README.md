@@ -3,6 +3,8 @@
 
 BAF was written as the upper half of *YABI* [1], which knows how to consume these channel changes and execute them on hardware.
 
+Remember, perfect is the enemy of good enough.
+
 ### Future Features
 * Actually finishing this
 
