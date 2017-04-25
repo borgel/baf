@@ -4,9 +4,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+//TODO add macros for allocating animations of certain length
+
 typedef enum {
    BAF_OK,
    BAF_UNIMPLIMENTED,
+   BAF_BAD_PARAM,
    BAF_ANIMATION_NOT_STARTED,
    BAF_ERR,
 } baf_Error;
@@ -50,6 +53,7 @@ struct baf_AnimationStepRandom {
 };
 
 struct baf_Animation {
+   uint32_t                            id;
    uint32_t                            numSteps;
    uint32_t                            timeStepMS;
 
@@ -82,10 +86,10 @@ struct baf_Config {
 };
 
 
-baf_Error baf_init(struct baf_Config cfg);
+baf_Error baf_init(struct baf_Config* const cfg);
 baf_Error baf_giveTime(uint32_t systimeMS);
-baf_Error baf_startAnimation(struct baf_Animation* const anim, baf_AnimationWhen when);
-baf_Error baf_stopAnimation(struct baf_Animation* const anim, baf_AnimationWhen when);
+baf_Error baf_startAnimation(struct baf_Animation const * const anim, baf_AnimationWhen when);
+baf_Error baf_stopAnimation(struct baf_Animation const * const anim, baf_AnimationWhen when);
 baf_Error baf_stopAllAnimations(baf_AnimationWhen when);
 bool baf_isInProgress(struct baf_Animation* const anim);
 
