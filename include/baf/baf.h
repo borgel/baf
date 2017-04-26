@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+//FIXME find a better way to handle this
+//the number of channels 'wide' each animation is
+#define BAF_CHANNEL_WIDTH           10
+
 //TODO add macros for allocating animations of certain length
 
 typedef enum {
@@ -39,10 +43,12 @@ typedef enum {
 } baf_AnimationType;
 
 struct baf_AnimationStepSimple {
+   //FIXME does this need to be an array?
    struct baf_ChannelSetting  setting;
 };
 
 struct baf_AnimationStepRandom {
+   //ignore val, but use transition time and id
    struct baf_ChannelSetting  setting;
    baf_ChannelValue           maxValue;
    baf_ChannelValue           minValue;
@@ -60,9 +66,9 @@ struct baf_Animation {
    baf_AnimationType                   type;
    //there should be `numSteps` elements in this array
    union {
-      struct baf_AnimationStepSimple*  aSimple;
-      struct baf_AnimationStepSimple*  aLooped;
-      struct baf_AnimationStepRandom*  aRandomLoop;
+      struct baf_AnimationStepSimple*  aSimple[BAF_CHANNEL_WIDTH];
+      struct baf_AnimationStepSimple*  aLooped[BAF_CHANNEL_WIDTH];
+      struct baf_AnimationStepRandom*  aRandomLoop[BAF_CHANNEL_WIDTH];
    };
 };
 

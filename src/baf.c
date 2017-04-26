@@ -2,6 +2,15 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
+
+//FIXME needed?
+/*
+struct baf_AnimationSlice {
+   baf_AnimationStep             step;
+   struct baf_Animation const *  animActive;
+};
+*/
 
 struct baf_State {
    bool                          init;
@@ -36,24 +45,72 @@ baf_Error baf_giveTime(uint32_t systimeMS) {
    //if none to run, return
    //if this was an RTOS, this thread would sleep between events
 
+   //TODO make these asserts
    if(!state.init) {
       return BAF_ERR;
    }
    else if(!state.running) {
       return BAF_ANIMATION_NOT_STARTED;
    }
+   else if(!state.animActive) {
+      return BAF_ERR;
+   }
 
-   //TODO
    //check to see if any control points have passed
-   //execute those channel changes
+   baf_AnimationStep newStep = systimeMS / state.animActive->timeStepMS;
+   //FIXME needed? somehow have to handle loops
+   newStep %= state.animActive->numSteps;
+   if(newStep <= state.step) {
+      //nothing to do
+      return BAF_OK;
+   }
+
 
    //TODO add a 'get animation slice' command, that advances the current anim state
    //(new struct for postion + anim?) and returns a const ptr to the one to execute
 
+   //check if animation is done. if so, switch to next
+   if(newStep > state.animActive->numSteps &&
+         state.animActive->type == BAF_ASCHED_ONESHOT) {
+      state.animActive = state.animNext;
+      state.animNext = NULL;
+      newStep = 0;
+
+      if(!state.animActive) {
+         return BAF_OK;
+      }
+   }
+
+   //execute just the FINAL channel change (aka if we are 5 behind, just jump to the last
+   //get the step to display
+   state.step = newStep;
+   switch(state.animActive->type) {
+      case BAF_ASCHED_ONESHOT:
+      {
+         //TODO get this slice
+         //iterate across it and execute channel changes
+         break;
+      }
+
+      case BAF_ASCHED_LOOP:
+      case BAF_ASCHED_RANDOM_LOOP:
+      {
+         //TODO FIXME XXX do this one!
+         //iterate through all random channels
+         //calculate new value
+         //apply it
+         break;
+      }
+
+      default:
+         break;
+   }
+
+
    return BAF_UNIMPLIMENTED;
 
 
-   //TODO return MS until next event
+   //TODO return MS until next event?
 }
 
 /*
