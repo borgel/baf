@@ -211,12 +211,21 @@ static bool baf_areAnimationsSame(struct baf_Animation const * const a, struct b
 }
 
 static baf_ChannelValue baf_calcRandomChannelValue(struct baf_RandomParameters const * const params) {
+   //baf_ChannelValue v = (baf_ChannelValue)(state.config.rngCB() * (float)((float)params->maxValue - (float)params->minValue));
+   baf_ChannelValue v = (baf_ChannelValue)(state.config.rngCB(params->maxValue - params->minValue));
+   v += params->minValue;
 
-   //TODO this
-   printf("calc params\n");
+   printf("unweighted = %u", v);
 
+   //now apply bias
+   float bias = (float)params->biasValue;
+   //TODO apply bias variance
+   float bweight = (float)params->biasWeight / 100.0;
+   v = (baf_ChannelValue)(((float)v * (1.0 - bweight)) + (bias * bweight));
 
-   return 0;
+   printf(" weighted = %u\n", v);
+
+   return v;
 }
 
 

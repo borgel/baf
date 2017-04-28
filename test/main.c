@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "baf/baf.h"
@@ -39,6 +40,11 @@ static void t1ChanGroupSet(struct baf_ChannelSetting const * const channels, baf
    }
 }
 
+static uint32_t t1RNG(uint32_t range) {
+   //return (float)rand()/(float)(RAND_MAX / 100);
+   return rand() % range;
+}
+
 struct baf_Animation t1a1 = {
    .id                     = 3,
    .numSteps               = 1,
@@ -51,33 +57,17 @@ struct baf_Animation t1a1 = {
       .params              = {
          .maxValue         = 100,
          .minValue         = 0,
-         .biasValue        = 0,
-         .biasWeight       = 0,
+         .biasValue        = 90,
+         .biasWeight       = 50,
       },
    },
 };
 
 void test1(void) {
-   /*
-   yabi_Error res;
-
-   struct yabi_Config cfg = {
-      .frameStartCB           = t1_FrameStart,
-      .frameEndCB             = t1_FrameEnd,
-      .channelChangeCB        = t1_ChanCH,
-      .channelChangeGroupCB   = t1_ChanGroupCH,
-      .hwConfig = {
-         .setup               = t1_HwSetup,
-         .teardown            = t1_HwTeardown,
-         .hwConfig            = NULL,
-      },
-   };
-   */
-
    baf_Error res;
 
    struct baf_Config cfg = {
-      .rngCB               = NULL,
+      .rngCB               = t1RNG,
       .animationStartCB    = NULL,
       .animationStopCB     = NULL,
       .setChannelGroupCB   = t1ChanGroupSet,

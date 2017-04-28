@@ -58,8 +58,9 @@ struct baf_RandomParameters {
    baf_ChannelValue           minValue;
 
    //FIXME push up to user?
-   baf_ChannelValue           biasValue;
-   uint8_t                    biasWeight; //0 (none) - 100
+   baf_ChannelValue           biasValue;        // what value to tend the RNG value towards
+   uint8_t                    biasWeight;       //0 (none) - 100, how much should the RNG value tend towards the bias value
+   baf_ChannelValue           biasVariance;     //how much RNG to apply to the bias value
 };
 
 struct baf_AnimationStepRandom {
@@ -89,7 +90,7 @@ struct baf_Animation {
    };
 };
 
-typedef void (*baf_GetRNG)(uint32_t rng);
+typedef uint32_t (*baf_GetRNG)(uint32_t range);
 typedef void (*baf_AnimationStartCallback)(struct baf_Animation const * anim);
 typedef void (*baf_AnimationStopCallback)(struct baf_Animation const * anim);
 typedef void (*baf_SetChannelGroup)(struct baf_ChannelSetting const * const channels, baf_ChannelValue* const values, uint32_t num);
