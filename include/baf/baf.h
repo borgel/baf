@@ -95,18 +95,11 @@ typedef void (*baf_AnimationStartCallback)(struct baf_Animation const * anim);
 typedef void (*baf_AnimationStopCallback)(struct baf_Animation const * anim);
 typedef void (*baf_SetChannelGroup)(struct baf_ChannelSetting const * const channels, baf_ChannelValue* const values, uint32_t num);
 
-//TODO do these make sense? Should they be titled 'global'? The void* is for user config data
-typedef void* const (*baf_HardwareSetup)(void);
-typedef void (*baf_HardwareTeardown)(void* const hwConfig);
-
 struct baf_Config {
    baf_GetRNG                 rngCB;
    baf_AnimationStartCallback animationStartCB;
    baf_AnimationStopCallback  animationStopCB;
    baf_SetChannelGroup        setChannelGroupCB;
-
-   baf_HardwareSetup          hwSetupCB;
-   baf_HardwareTeardown       hwTeardownCB;
 };
 
 baf_Error baf_init(struct baf_Config* const cfg);

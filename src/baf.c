@@ -32,13 +32,9 @@ baf_Error baf_init(struct baf_Config* const cfg) {
       return BAF_BAD_PARAM;
    }
 
-
    state.config = *cfg;
    state.animActive = NULL;
    state.animNext = NULL;
-
-   //TODO finish
-   //TODO state-tracking structs?
 
    state.init = true;
    return BAF_OK;
