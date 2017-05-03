@@ -16,10 +16,11 @@ struct baf_State {
    //FIXME make a time-until-run?
    bool                          running;
    baf_AnimationStep             step;
+   uint32_t                      lastStepTimeMS;
    struct baf_Animation const *  animActive;
    struct baf_Animation const *  animNext;
 
-   struct baf_Config       config;
+   struct baf_Config             config;
 };
 static struct baf_State state = {.init = false};
 
@@ -70,65 +71,55 @@ baf_Error baf_giveTime(uint32_t const systimeMS, uint32_t* const timeTillNextMS)
    //check to see if any control points have passed
    baf_AnimationStep newStep = systimeMS / state.animActive->timeStepMS;
    //FIXME rm
-   printf("new step is %d ", newStep);
+   printf("%u/%u means new step is %d ", systimeMS, state.animActive->timeStepMS, newStep);
    //FIXME needed? somehow have to handle loops
    newStep %= state.animActive->numSteps;
 
-   printf(" %% %u steps to %d\n", state.animActive->numSteps, newStep);
+   printf("modded by total steps (%u) we are on step %d of this animation\n", state.animActive->numSteps, newStep);
 
-   if(newStep < state.step) {
+   printf("new = %d, state.step = %d\n", newStep, state.step);
+
+   if(systimeMS < state.lastStepTimeMS + state.animActive->timeStepMS) {
       //nothing to do, no steps have passed
+      printf("No change since last timeslice (we haven't advanced steps)\n");
       return BAF_OK;
    }
-   if(newStep > state.animActive->numSteps) {
-      if(IS_ONESHOT(state.animActive)) {
-         //animation is done, start the next one if needed
-
-
-         //XXX
-
-
+   if(newStep >= state.animActive->numSteps) {
+      printf("Animation over, figuring it out\n");
 
       //indicate this animation is done
       if(state.config.animationStopCB) {
          state.config.animationStopCB(state.animActive);
       }
 
-      state.animActive = state.animNext;
-      state.animNext = NULL;
-      newStep = 0;
+      if(IS_ONESHOT(state.animActive)) {
+         //animation is done, start the next one if needed
+         state.animActive = state.animNext;
+         state.animNext = NULL;
+         newStep = 0;
+         state.lastStepTimeMS = 0;
+
+         if(!state.animActive) {
+            return BAF_OK;
+         }
+      }
+      else if(IS_LOOPED(state.animActive)) {
+         //restart
+         newStep = 0;
+      }
 
       //indicate the next animation is starting
       if(state.config.animationStartCB) {
          state.config.animationStartCB(state.animActive);
       }
-
-      if(!state.animActive) {
-         return BAF_OK;
-      }
-
-
-         //XXX
-
-
-
-      else if(IS_LOOPED(state.animActive)) {
-         //restart
-         newStep = 0;
-      }
    }
 
-   //TODO filter for oneshot? Loops cycle over eventually and could be replaced
-   //check if animation is done. if so, switch to the next
-   //FIXME > or >=
-   if(newStep > state.animActive->numSteps &&
-         IS_ONESHOT(state.animActive)) {
-
-   }
+   printf("Running calcs...\n");
 
    //execute just the FINAL channel change (aka if we are 5 behind, just jump to the last
    //get the step to display
    state.step = newStep;
+   state.lastStepTimeMS = systimeMS;
    switch(state.animActive->type) {
 
       case BAF_ASCHED_SIMPLE_RANDOM_LOOP:
@@ -192,7 +183,10 @@ baf_Error baf_startAnimation(struct baf_Animation const * const anim, baf_Animat
    }
    else {
       state.animActive = anim;
+      state.lastStepTimeMS = 0;
+      state.step = 0;
    }
+   state.step = 0;
    state.running = true;
 
    //prime it

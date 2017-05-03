@@ -6,6 +6,7 @@
 #include "baf/baf.h"
 
 #define US_TO_MS    (1000)
+#define STEPGAP_MS  (100)
 
 static void test1(void);
 
@@ -15,14 +16,14 @@ void doLoop(int iters) {
    uint32_t fakeTime = 0;
 
    for(int i = 0; i < iters; i++) {
-      fakeTime = i * 100;
+      fakeTime = i * STEPGAP_MS;
 
       res = baf_giveTime(fakeTime, &nextTimeMS);
       if(res != BAF_OK) {
          printf("%d: Give Time returned %d\n", i, res);
       }
 
-      usleep(US_TO_MS * fakeTime);
+      usleep(STEPGAP_MS * US_TO_MS);
    }
 }
 
@@ -55,7 +56,7 @@ static uint32_t t1RNG(uint32_t range) {
 struct baf_Animation t1a1 = {
    .id                     = 3,
    .numSteps               = 1,
-   .timeStepMS             = 100,
+   .timeStepMS             = 1000,
    .type                   = BAF_ASCHED_SIMPLE_RANDOM_LOOP,
 
    .aRandomSimpleLoop      = {
@@ -99,5 +100,5 @@ void test1(void) {
       printf("Start returned %d\n", res);
    }
 
-   doLoop(10);
+   doLoop(50);
 }
