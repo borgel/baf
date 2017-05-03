@@ -4,16 +4,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-//FIXME rm
-#include <stdio.h>
-
 #define IS_ONESHOT(x)   (x->type > BAF_ASCHED_ONESHOT_START && x->type < BAF_ASCHED_LOOP_START)
 #define IS_LOOPED(x)    (x->type > BAF_ASCHED_LOOP_START && x->type < BAF_ASCHED_END)
 
 struct baf_State {
    bool                          init;
 
-   //FIXME make a time-until-run?
    bool                          running;
    baf_AnimationStep             step;
    uint32_t                      lastStepTimeMS;
@@ -70,23 +66,13 @@ baf_Error baf_giveTime(uint32_t const systimeMS, uint32_t* const timeTillNextMS)
 
    //check to see if any control points have passed
    baf_AnimationStep newStep = systimeMS / state.animActive->timeStepMS;
-   //FIXME rm
-   printf("%u/%u means new step is %d ", systimeMS, state.animActive->timeStepMS, newStep);
-   //FIXME needed? somehow have to handle loops
    newStep %= state.animActive->numSteps;
-
-   printf("modded by total steps (%u) we are on step %d of this animation\n", state.animActive->numSteps, newStep);
-
-   printf("new = %d, state.step = %d\n", newStep, state.step);
 
    if(systimeMS < state.lastStepTimeMS + state.animActive->timeStepMS) {
       //nothing to do, no steps have passed
-      printf("No change since last timeslice (we haven't advanced steps)\n");
       return BAF_OK;
    }
    if(newStep >= state.animActive->numSteps) {
-      printf("Animation over, figuring it out\n");
-
       //indicate this animation is done
       if(state.config.animationStopCB) {
          state.config.animationStopCB(state.animActive);
@@ -114,8 +100,6 @@ baf_Error baf_giveTime(uint32_t const systimeMS, uint32_t* const timeTillNextMS)
       }
    }
 
-   printf("Running calcs...\n");
-
    //execute just the FINAL channel change (aka if we are 5 behind, just jump to the last
    //get the step to display
    state.step = newStep;
@@ -136,16 +120,12 @@ baf_Error baf_giveTime(uint32_t const systimeMS, uint32_t* const timeTillNextMS)
             id = &asr->id[i];
             setting.id = *id;
 
-            printf("id = %u ", *id);
-
             //calculate all values
             value = baf_calcRandomChannelValue(&state.animActive->aRandomSimpleLoop.params);
 
             //send updates one at a time
             state.config.setChannelGroupCB(&setting, &value, 1);
          }
-
-         puts("");
 
          //TODO apply updates all at once
          break;
@@ -233,15 +213,11 @@ static baf_ChannelValue baf_calcRandomChannelValue(struct baf_RandomParameters c
    baf_ChannelValue v = (baf_ChannelValue)(state.config.rngCB(params->maxValue - params->minValue));
    v += params->minValue;
 
-   printf("unweighted = %u", v);
-
    //now apply bias
    float bias = (float)params->biasValue;
    //TODO apply bias variance
    float bweight = (float)params->biasWeight / 100.0;
    v = (baf_ChannelValue)(((float)v * (1.0 - bweight)) + (bias * bweight));
-
-   printf(" weighted = %u\n", v);
 
    return v;
 }
