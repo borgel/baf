@@ -40,6 +40,13 @@ static void t1ChanGroupSet(struct baf_ChannelSetting const * const channels, baf
    }
 }
 
+static void t1AStart(struct baf_Animation const * anim) {
+   printf("Animation #%u Start\n", anim->id);
+}
+static void t1AStop(struct baf_Animation const * anim) {
+   printf("Animation #%u Stop\n", anim->id);
+}
+
 static uint32_t t1RNG(uint32_t range) {
    //return (float)rand()/(float)(RAND_MAX / 100);
    return rand() % range;
@@ -68,8 +75,8 @@ void test1(void) {
 
    struct baf_Config cfg = {
       .rngCB               = t1RNG,
-      .animationStartCB    = NULL,
-      .animationStopCB     = NULL,
+      .animationStartCB    = t1AStart,
+      .animationStopCB     = t1AStop,
       .setChannelGroupCB   = t1ChanGroupSet,
 
       .hwSetupCB           = NULL,

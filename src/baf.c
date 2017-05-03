@@ -69,18 +69,25 @@ baf_Error baf_giveTime(uint32_t const systimeMS, uint32_t* const timeTillNextMS)
 
    //check to see if any control points have passed
    baf_AnimationStep newStep = systimeMS / state.animActive->timeStepMS;
+   //FIXME rm
+   printf("new step is %d ", newStep);
    //FIXME needed? somehow have to handle loops
    newStep %= state.animActive->numSteps;
+
+   printf(" %% %u steps to %d\n", state.animActive->numSteps, newStep);
 
    if(newStep < state.step) {
       //nothing to do, no steps have passed
       return BAF_OK;
    }
+   if(newStep > state.animActive->numSteps) {
+      if(IS_ONESHOT(state.animActive)) {
+         //animation is done, start the next one if needed
 
-   //TODO filter for oneshot? Loops cycle over eventually and could be replaced
-   //check if animation is done. if so, switch to the next
-   if(newStep > state.animActive->numSteps &&
-         IS_ONESHOT(state.animActive)) {
+
+         //XXX
+
+
 
       //indicate this animation is done
       if(state.config.animationStopCB) {
@@ -99,6 +106,24 @@ baf_Error baf_giveTime(uint32_t const systimeMS, uint32_t* const timeTillNextMS)
       if(!state.animActive) {
          return BAF_OK;
       }
+
+
+         //XXX
+
+
+
+      else if(IS_LOOPED(state.animActive)) {
+         //restart
+         newStep = 0;
+      }
+   }
+
+   //TODO filter for oneshot? Loops cycle over eventually and could be replaced
+   //check if animation is done. if so, switch to the next
+   //FIXME > or >=
+   if(newStep > state.animActive->numSteps &&
+         IS_ONESHOT(state.animActive)) {
+
    }
 
    //execute just the FINAL channel change (aka if we are 5 behind, just jump to the last
@@ -211,7 +236,6 @@ static bool baf_areAnimationsSame(struct baf_Animation const * const a, struct b
 }
 
 static baf_ChannelValue baf_calcRandomChannelValue(struct baf_RandomParameters const * const params) {
-   //baf_ChannelValue v = (baf_ChannelValue)(state.config.rngCB() * (float)((float)params->maxValue - (float)params->minValue));
    baf_ChannelValue v = (baf_ChannelValue)(state.config.rngCB(params->maxValue - params->minValue));
    v += params->minValue;
 
