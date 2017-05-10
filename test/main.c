@@ -79,9 +79,6 @@ void test1(void) {
       .animationStartCB    = t1AStart,
       .animationStopCB     = t1AStop,
       .setChannelGroupCB   = t1ChanGroupSet,
-
-      .hwSetupCB           = NULL,
-      .hwTeardownCB        = NULL,
    };
 
    res = baf_init(&cfg);

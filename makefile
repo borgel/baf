@@ -22,6 +22,7 @@ clean:
 	-rm -f $(OBJECTS)
 	-rm -f baf.a
 
+	-rm -f main.o
 	-rm -f tester
 	-rm -f test/*.o
 
