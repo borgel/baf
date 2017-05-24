@@ -112,7 +112,7 @@ baf_Error baf_giveTime(uint32_t const systimeMS, uint32_t* const timeTillNextMS)
 
          setting.transitionTimeMS = asr->transitionTimeMS;
 
-         for(int i = 0; i < BAF_CHANNEL_WIDTH; i++) {
+         for(int i = 0; i < asr->idLen; i++) {
             id = &asr->id[i];
             setting.id = *id;
 
@@ -152,6 +152,13 @@ baf_Error baf_startAnimation(struct baf_Animation const * const anim, baf_Animat
    else if(when != BAF_ASTART_IMMEDIATE) {
       //TODO test and unlock this
       return BAF_UNIMPLIMENTED;
+   }
+
+   //specific sanity checks
+   if(anim->type == BAF_ASCHED_SIMPLE_RANDOM_LOOP) {
+      if(!anim->aRandomSimpleLoop.id || anim->aRandomSimpleLoop.idLen == 0) {
+         return BAF_BAD_PARAM;
+      }
    }
 
    if(when == BAF_ASTART_ON_FINISH) {

@@ -4,10 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-//FIXME find a better way to handle this
-//the number of channels 'wide' each animation is
-#define BAF_CHANNEL_WIDTH           10
-
 //TODO add macros for allocating animations of certain length
 
 typedef enum {
@@ -70,7 +66,9 @@ struct baf_AnimationStepRandom {
 };
 
 struct baf_AnimationSimpleRandom {
-   baf_ChannelID                 id[BAF_CHANNEL_WIDTH];
+   // an array MUST be provided by the user, of the number of channels they expect to use
+   baf_ChannelID*                id;
+   uint32_t                      idLen;
    uint32_t                      transitionTimeMS;
    struct baf_RandomParameters   params;
 };

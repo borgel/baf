@@ -53,6 +53,9 @@ static uint32_t t1RNG(uint32_t range) {
    return rand() % range;
 }
 
+//backing array of channel IDs
+static baf_ChannelID chans[10];
+
 struct baf_Animation t1a1 = {
    .id                     = 3,
    .numSteps               = 1,
@@ -60,8 +63,10 @@ struct baf_Animation t1a1 = {
    .type                   = BAF_ASCHED_SIMPLE_RANDOM_LOOP,
 
    .aRandomSimpleLoop      = {
-      //.id set programmatically
-      .transitionTimeMS     = 50,
+      .id                  = chans,
+      .idLen               = 10,
+
+      .transitionTimeMS    = 50,
       .params              = {
          .maxValue         = 100,
          .minValue         = 0,
@@ -88,7 +93,7 @@ void test1(void) {
    }
 
    //setup the channel IDs for this animation
-   for(int i = 0; i < BAF_CHANNEL_WIDTH; i++) {
+   for(int i = 0; i < t1a1.aRandomSimpleLoop.idLen; i++) {
       t1a1.aRandomSimpleLoop.id[i] = i;
    }
 
