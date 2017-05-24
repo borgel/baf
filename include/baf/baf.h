@@ -83,10 +83,10 @@ struct baf_Animation {
    baf_AnimationType       type;
    //there should be `numSteps` elements in this array
    union {
-      struct baf_AnimationStepSimple*  aSimple[BAF_CHANNEL_WIDTH];
-      struct baf_AnimationStepSimple*  aLooped[BAF_CHANNEL_WIDTH];
+      //struct baf_AnimationStepSimple*  aSimple[BAF_CHANNEL_WIDTH];
+      //struct baf_AnimationStepSimple*  aLooped[BAF_CHANNEL_WIDTH];
       struct baf_AnimationSimpleRandom aRandomSimpleLoop;
-      struct baf_AnimationStepRandom*  aRandomLoop[BAF_CHANNEL_WIDTH];
+      //struct baf_AnimationStepRandom*  aRandomLoop[BAF_CHANNEL_WIDTH];
    };
 };
 
